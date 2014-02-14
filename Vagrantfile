@@ -34,10 +34,12 @@ Vagrant.configure("2") do |config|
   # Share an additional folder to the guest VM. The first argument is
   # an identifier, the second is the path on the guest to mount the
   # folder, and the third is the path on the host to the actual folder.
-  config.vm.synced_folder "../", "/vagrant", id: "vagrant-root"
+  config.vm.synced_folder "./", "/vagrant", id: "vagrant-root"
 
   # Update apt
   config.vm.provision :shell, :inline => "aptitude -q2 update && aptitude install -y python-pip"
+  config.vm.provision :shell, :inline => "pip install pip --upgrade"
+
 
   # add some helpful puppet modules
   # fyi: specifying '--force' means that a reprovision won't include new module dependencies,
@@ -46,6 +48,7 @@ Vagrant.configure("2") do |config|
     shell.inline = "mkdir -p /etc/puppet/modules;
                   puppet module install --force thomasvandoren/redis;
                   puppet module install --force puppetlabs/nodejs;
+                  puppet module install --force puppetlabs/stdlib;
                   puppet module install --force thias/mongodb;
                   puppet module install --force puppetlabs/vcsrepo"
   end
@@ -56,7 +59,7 @@ Vagrant.configure("2") do |config|
   # the file base.pp in the manifests_path directory.
   config.vm.provision :puppet do |puppet|
     # puppet.module_path won't allow for the externally installed modules above :(
-    puppet.options = "--verbose --debug --modulepath=/etc/puppet/modules:/vagrant/dev/puppet/modules"
+    puppet.options = "--modulepath=/etc/puppet/modules:/vagrant/puppet/modules"
     puppet.manifests_path = "puppet/manifests"
     puppet.manifest_file  = "standalone.pp"
   end
