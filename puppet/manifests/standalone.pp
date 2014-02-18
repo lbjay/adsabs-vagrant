@@ -2,7 +2,6 @@
 # Standalone manifest - for dev Vagrant box.
 #
 
-import 'lib/*.pp'
 
 include python
 include setuptools
