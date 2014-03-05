@@ -1,70 +1,55 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
-  # All Vagrant configuration is done here. The most common configuration
-  # options are documented and commented below. For a complete reference,
-  # please see the online documentation at vagrantup.com.
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "precise64"                                                                                                                                                                     
+  config.vm.box = "precise64"
 
-  config.vm.provider "virtualbox" do |v|                                                                                                                                                       
-    v.memory = 1024                                                                                                                                                                            
-    v.name = "beer"                                                                                                                                                                            
-  end                                                                                                                                                                                          
-
-  config.vm.define "beer" do |beer|
-  end         
+  config.vm.provider :lxc do |lxc|
+      #lxc.customize 'cgroup.memory.limit_in_bytes', '1024M'
+      lxc.name = "ads-appserver"
+  end
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210.box"                                                                                                  
+  #config.vm.box_url = "https://dl.dropboxusercontent.com/s/x1085661891dhkz/lxc-centos6.5-2013-12-02.box"
+  #config.vm.box_url = "https://dl.dropboxusercontent.com/s/eukkxp5mp2l5h53/lxc-centos6.4-2013-10-24.box"
+      config.vm.box_url = "http://bit.ly/vagrant-lxc-precise64-2013-10-23"
 
-  # Assign this VM to a host-only network IP, allowing you to access it
-  # via the IP. Host-only networks can talk to the host machine as well as
-  # any other machines on the same network, but cannot be accessed (through this
-  # network interface) by any external networks.
-  config.vm.network :private_network, ip: "192.168.33.101"
 
-  # Forward a port from the guest to the host, which allows for outside
-  # computers to access the VM, whereas host only networking does not.
-  config.vm.network "forwarded_port", guest: 5000, host: 5050
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+      config.vm.network :forwarded_port, guest: 8000, host: 8000
+      config.vm.network :forwarded_port, guest: 5000, host: 5000
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network :private_network, ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  # config.vm.network :public_network
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  # config.ssh.forward_agent = true
 
   # Share an additional folder to the guest VM. The first argument is
-  # an identifier, the second is the path on the guest to mount the
-  # folder, and the third is the path on the host to the actual folder.
-  config.vm.synced_folder "./", "/vagrant", id: "vagrant-root"
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  # config.vm.synced_folder ".", "/vagrant/"
 
-  # Update apt
-  config.vm.provision :shell, :inline => "aptitude -q2 update && aptitude install -y python-pip"
-  config.vm.provision :shell, :inline => "pip install pip --upgrade"
+    config.vm.provision :puppet do |puppet|
+      puppet.manifests_path = "manifests"
+      puppet.manifest_file  = "site.pp"
+    end
 
-
-  # add some helpful puppet modules
-  # fyi: specifying '--force' means that a reprovision won't include new module dependencies,
-  #      but is necessary to prevent errors when puppet tries to reinstall
-  config.vm.provision :shell do |shell|
-    shell.inline = "mkdir -p /etc/puppet/modules;
-                  puppet module install --force thomasvandoren/redis;
-                  puppet module install --force puppetlabs/nodejs;
-                  puppet module install --force puppetlabs/stdlib;
-                  puppet module install --force thias/mongodb;
-                  puppet module install --force puppetlabs/vcsrepo"
-  end
-
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file base.pp in the manifests_path directory.
-  config.vm.provision :puppet do |puppet|
-    # puppet.module_path won't allow for the externally installed modules above :(
-    puppet.options = "--modulepath=/etc/puppet/modules:/vagrant/puppet/modules"
-    puppet.manifests_path = "puppet/manifests"
-    puppet.manifest_file  = "standalone.pp"
-  end
-
-  # Application provision
-  config.vm.provision :shell, :inline => "cd /vagrant && stdbuf -o0 fab -f adsabs-fabric/fabfile.py build; exit 0"
 
 end

@@ -1,3 +1,0 @@
-class { 'mongodb':
-  auth => 'true',
-}
