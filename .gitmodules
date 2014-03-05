@@ -1,6 +1,0 @@
-[submodule "adsabs-fabric"]
-	path = adsabs-fabric
-	url = git@github.com:adsabs/adsabs-fabric.git
-[submodule "adsabs"]
-	path = adsabs
-	url = git@github.com:adsabs/adsabs.git
