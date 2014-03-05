@@ -9,6 +9,7 @@ include nginx
 vcsrepo {"/proj/ads/adsabs":
   ensure        => latest,
   provider      => git,
+  user          => vagrant,
   source        => "https://github.com/vsudilov/adsabs.git";
 }
 
@@ -34,7 +35,7 @@ nginx::resource::vhost { 'labs':
 nginx::resource::upstream { 'gunicorn':
  ensure     => present,
  members    => [
-   'unix://tmp/gunicorn.socket fail_timeout=0', #module will append the ; automatically
+   'unix:/tmp/gunicorn.socket fail_timeout=0', #module will append the ; automatically
  ],
 }
 
