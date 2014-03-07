@@ -20,7 +20,8 @@ class {
 class stage_2 {
 
   exec { 'provision': #Can't call newly bootstrapped modules from within the same puppet process!
-    command => 'puppet apply /vagrant/manifests/stage2.pp',
+    command     => 'puppet apply /vagrant/manifests/stage2.pp',
+    timeout     => 0;
   }
 
 }
