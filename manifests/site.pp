@@ -28,11 +28,16 @@ class stage_2 {
 
 class stage_1 {
 
+  user {'vagrant':
+    ensure      => present,
+  }
+
   file {"/proj/":
     ensure      => directory,
     recurse     => false,
     owner       => vagrant,
     group       => vagrant,
+    require     => User['vagrant'],
   }
 
 
@@ -41,7 +46,7 @@ class stage_1 {
     recurse     => false,
     owner       => vagrant,
     group       => vagrant,
-    require     => File["/proj/"];
+    require     => File["/proj/"]; #Alternatvively, use `exec {'mkdir -p /path/to/foo/': }`
   }
 
   exec { 'initial_apt_update':
