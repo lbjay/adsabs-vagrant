@@ -23,7 +23,8 @@ vcsrepo {"/proj/ads/adsabs":
 exec {'pip_install_deps':
   command   => 'pip install -r requirements.txt',
   cwd       => '/proj/ads/adsabs/',
-  require   => [Vcsrepo['/proj/ads/adsabs']];
+  require   => [Vcsrepo['/proj/ads/adsabs']],
+  timeout   => 0,
 }
 
 nginx::resource::vhost { 'labs':
@@ -45,10 +46,8 @@ file {'app_deploy_script':
   owner     => vagrant,
   mode      => "700",
   content   => "
-  #/bin/bash
-  [ -d adsabs-fabric ] || git clone -b vss https://github.com/adsabs/adsabs-fabric.git
-  fab -f adsabs-fabric/fabfile local init
-  sudo fab -f adsabs-fabric/fabfile local run_production
-  "
-
+#!/bin/bash
+[ -d adsabs-fabric ] || git clone -b vss https://github.com/adsabs/adsabs-fabric.git
+fab -f adsabs-fabric/fabfile local init
+sudo fab -f adsabs-fabric/fabfile local run_production",
 }
