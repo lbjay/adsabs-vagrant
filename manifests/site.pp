@@ -56,7 +56,7 @@ class stage_1 {
 
   package { ['rubygems','ruby-dev','puppet','git',
               'nginx','python-pip','libmysqlclient-dev',
-              'python-dev','build-essential','libxml2-dev','libxslt-dev']:
+              'python-dev','build-essential','libxml2-dev','libxslt-dev','mongodb']:
     ensure    => installed,
     require   => Exec['initial_apt_update'];
   }
