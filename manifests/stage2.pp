@@ -2,7 +2,6 @@
 Exec { path => [ "/bin/", "/sbin/" , "/usr/bin/", "/usr/sbin/", "/usr/local/bin" ] }
 
 
-include mongodb
 include nginx
 
 
@@ -23,6 +22,8 @@ vcsrepo {"/proj/ads/adsabs":
 exec {'pip_install_deps':
   command   => 'pip install -r requirements.txt',
   cwd       => '/proj/ads/adsabs/',
+  user      => root,
+  environment => 'HOME=/root',
   require   => [Vcsrepo['/proj/ads/adsabs']],
   timeout   => 0,
 }
